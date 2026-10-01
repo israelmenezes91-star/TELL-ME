@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#087DB8">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Tell Me</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{--oc:#087DB8;--deep:#075985;--teal:#00A99D;--tq:#18C5C0;--bg:#F4F8FA;--card:#fff;--tx:#123047;--mu:#5d7688;--ln:#dbe6ec;--g:linear-gradient(135deg,#087DB8,#00A99D)}
+html{color-scheme:light}
+html.dark{color-scheme:dark;--bg:#0b1c27;--card:#12303f;--tx:#e8f4f8;--mu:#93b2c2;--ln:#1f4356}
+html.biz{--oc:#9a7220;--deep:#6f5112;--teal:#b8892b;--tq:#d4af37;--g:linear-gradient(135deg,#6f5112,#9a7220 60%,#b8892b)}
+html.biz.dark{--bg:#15110a;--card:#231c0e;--tx:#f6ecd2;--mu:#c9b98f;--ln:#3a2f17;--oc:#d4af37;--g:linear-gradient(135deg,#b8892b,#e0b64a)}
+html.biz.dark .btn:not(.o),html.biz.dark .chip.on,html.biz.dark header{color:#1a1405}
+html.biz.dark header .btn{color:#1a1405!important;border-color:#1a1405!important}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font-family:Outfit,system-ui,sans-serif;background:var(--bg);color:var(--tx);padding-top:env(safe-area-inset-top)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--ln);border-radius:12px;background:var(--card);margin-bottom:8px}
+.btn{background:var(--g);color:#fff;border:0;border-radius:12px;padding:11px 16px;font-weight:600}
+.btn.o{background:none;color:var(--oc);border:1px solid var(--oc)}
+:focus-visible{outline:3px solid var(--tq);outline-offset:2px}
+header{background:var(--g);color:#fff;padding:14px 16px 18px;border-radius:0 0 26px 26px}
+header h1{font-size:1.5rem;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+header p{opacity:.9;margin:4px 0 12px}
+header input{margin:0;border:0}
+main{padding:14px 16px calc(96px + env(safe-area-inset-bottom));max-width:980px;margin:auto}
+.tab{display:none}.tab.on{display:block}
+h2{font-size:1.15rem;margin:18px 0 10px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px}
+.chip{flex:none;border:1px solid var(--ln);background:var(--card);border-radius:20px;padding:8px 14px}
+.chip.on{background:var(--oc);color:#fff;border-color:var(--oc)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:var(--card);border-radius:20px;overflow:hidden;box-shadow:0 2px 10px #0a3a5a1a;cursor:pointer}
+.ph{height:150px;background:var(--g) center/cover;display:grid;place-items:center;font-size:3rem}
+.cb{padding:12px;display:grid;gap:3px}.cb span,.mu{color:var(--mu);font-size:.9rem}
+.st{color:#f5a623}
+.post{background:var(--card);border-radius:20px;padding:14px;margin-bottom:14px}
+.post img,.post video,.vid video{width:100%;border-radius:14px;margin-top:8px;max-height:420px;object-fit:cover;background:#000}
+.who{display:flex;gap:10px;align-items:center}
+.av{width:38px;height:38px;border-radius:50%;background:var(--g);color:#fff;display:grid;place-items:center;font-weight:700;flex:none;overflow:hidden}
+.av img{width:100%;height:100%;margin:0;border-radius:0}
+.acts{display:flex;gap:16px;margin-top:10px}.acts button{background:none;border:0;color:var(--mu)}
+#map{height:calc(100vh - 290px);min-height:320px;border-radius:20px;margin-top:10px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--ln);padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:900}
+nav button{flex:1;background:none;border:0;display:grid;gap:2px;justify-items:center;font-size:.72rem;color:var(--mu);padding:4px 0}
+nav button i{font-style:normal;font-size:1.3rem}
+nav button.on{color:var(--oc);font-weight:600}
+@media(min-width:900px){nav{top:0;bottom:0;right:auto;width:96px;flex-direction:column;justify-content:center;border-top:0;border-right:1px solid var(--ln)}body{padding-left:96px}main{padding-bottom:30px}}
+dialog{border:0;border-radius:22px;width:min(560px,94vw);max-height:90vh;padding:18px;background:var(--card);color:var(--tx)}
+dialog::backdrop{background:#04212f99}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.empty{text-align:center;color:var(--mu);padding:30px 10px}
+.pin{font-size:1.5rem;text-align:center}
+@media(prefers-reduced-motion:no-preference){.tab.on{animation:f .25s}@keyframes f{from{opacity:0}}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span id="brand">🌴 Tell Me</span><button id="prof" class="btn o" style="color:#fff;border-color:#fff;padding:6px 12px">Entrar</button></h1>
+  <p>Uma experiência única de viagem.</p>
+  <input id="q" placeholder="Pesquisar lugares, serviços ou cidades..." aria-label="Pesquisar">
+</header>
+<main>
+  <section id="inicio" class="tab on">
+    <h2>Categorias</h2><div class="chips" id="cats"></div>
+    <h2>Perto de ti</h2><div class="grid" id="near"></div>
+    <h2>Recomendados</h2><div class="grid" id="rec"></div>
+  </section>
+  <section id="explorar" class="tab">
+    <h2>Explorar</h2><p class="mu">Encontra lugares e experiências para conhecer.</p>
+    <div class="chips" id="cats2" style="margin-top:10px"></div>
+    <div class="row"><select id="sort"><option value="near">Mais próximos</option><option value="rate">Melhor classificados</option><option value="new">Mais recentes</option><option value="name">Nome</option></select><input id="city" placeholder="Cidade ou bairro"></div>
+    <div class="grid" id="list"></div>
+  </section>
+  <section id="mapa" class="tab">
+    <h2>Mapa</h2>
+    <div class="row"><button class="btn" id="loc">Usar a minha localização</button><button class="btn o" id="area">Pesquisar nesta área</button></div>
+    <div id="map"></div>
+  </section>
+  <section id="comentarios" class="tab">
+    <h2>Comentários</h2><p class="mu">Partilha experiências e descobre o que as pessoas dizem.</p>
+    <button class="btn" id="newpost" style="margin:10px 0">Criar publicação</button><div id="feed"></div>
+  </section>
+  <section id="videos" class="tab">
+    <h2>Vídeos</h2><p class="mu">Vê lugares, descobre experiências e conhece novos destinos.</p>
+    <button class="btn" id="newvid" style="margin:10px 0">Publicar vídeo</button><div class="grid" id="vids"></div>
+  </section>
+  <section id="definicoes" class="tab"><h2>Definições</h2><div id="sets"></div></section>
+</main>
+<nav id="nav"></nav>
+<dialog id="dlg"></dialog>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import*as A from"https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import*as F from"https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import*as T from"https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+const app=initializeApp({
+  apiKey:"AIzaSyC4B_qLPxu3C8_OehyWRHLTutF885A-QjM",
+  authDomain:"tell-me-db970.firebaseapp.com",
+  projectId:"tell-me-db970",
+  storageBucket:"tell-me-db970.firebasestorage.app",
+  messagingSenderId:"751156263192",
+  appId:"1:751156263192:web:e78bf06a8f8480a69e466d"
+});
+const auth=A.getAuth(app),db=F.getFirestore(app),st=T.getStorage(app);
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const CATS={hotel:['Hotéis','🏨'],restaurante:['Restaurantes','🍽️'],barbearia:['Barbearias','💈'],cafe:['Cafés','☕'],loja:['Lojas','🛍️'],servico:['Serviços','🛠️'],turismo:['Turismo','🏝️'],lazer:['Lazer','🎡'],outro:['Outros','📍']};
+const S={user:null,me:null,pos:null,est:[],cat:'',q:'',fav:new Set(),likes:new Set()};
+const getTh=()=>{try{return localStorage.getItem('tm-theme')||'auto'}catch{return'auto'}};
+function applyTheme(){const t=getTh(),r=document.documentElement,biz=S.me?.accountType==='business',dk=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);r.classList.toggle('dark',dk);r.classList.toggle('biz',biz);const h=$('#brand');if(h)h.textContent=biz?'🌴 Tell Me Business':'🌴 Tell Me'}
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);
+const ERR={'auth/invalid-credential':'E-mail ou palavra-passe incorretos.','auth/email-already-in-use':'Este e-mail já tem conta.','auth/weak-password':'A palavra-passe precisa de 6 ou mais caracteres.','auth/invalid-email':'E-mail inválido.','permission-denied':'Sem permissão para esta ação.'};
+const msg=e=>ERR[e.code?.replace('firestore/','')]||ERR[e.code]||e.message;
+const km=(a,b,c,d)=>{const r=x=>x*Math.PI/180,h=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2;return 12742*Math.asin(Math.sqrt(h))};
+const dist=e=>S.pos&&e.latitude!=null?km(S.pos.lat,S.pos.lng,e.latitude,e.longitude):null;
+const fd=d=>d==null?'':d<1?Math.round(d*1000)+' m':d.toFixed(1)+' km';
+const avg=e=>e.ratingCount?e.ratingSum/e.ratingCount:0;
+const stars=e=>e.ratingCount?`<span class="st">★ ${avg(e).toFixed(1)}</span> (${e.ratingCount})`:'Sem avaliações';
+const dlg=$('#dlg');
+const open=h=>{dlg.innerHTML=h+'<button class="btn o" style="margin-top:10px;width:100%" onclick="dlg.close()">Fechar</button>';dlg.showModal()};
+window.dlg=dlg;
+const toast=t=>{const d=document.createElement('div');d.textContent=t;d.style.cssText='position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#075985;color:#fff;padding:10px 16px;border-radius:14px;z-index:9999';document.body.append(d);setTimeout(()=>d.remove(),2800)};
+
+/* navegação */
+const TABS=[['inicio','🏠','Início'],['explorar','🧭','Explorar'],['mapa','🗺️','Mapa'],['comentarios','💬','Comentários'],['videos','🎬','Vídeos'],['definicoes','⚙️','Definições']];
+$('#nav').innerHTML=TABS.map(t=>`<button data-t="${t[0]}"><i>${t[1]}</i>${t[2]}</button>`).join('');
+function show(t){$$('.tab').forEach(x=>x.classList.toggle('on',x.id===t));$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));if(t==='mapa')initMap();if(t==='comentarios')loadFeed();if(t==='videos')loadVids();if(t==='definicoes')renderSets();scrollTo(0,0)}
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(b)show(b.dataset.t)};
+
+/* cartões */
+const card=e=>{const p=e.photos?.[0],d=dist(e);return`<article class="card" data-id="${e.id}"><div class="ph" style="${p?`background-image:url('${esc(p)}')`:''}">${p?'':CATS[e.category]?.[1]||'📍'}</div><div class="cb"><b>${esc(e.name)}</b><span>${CATS[e.category]?.[0]||'Outros'}, ${esc(e.city||'')} ${esc(e.neighborhood||'')}</span><span>${stars(e)} ${d!=null?'· '+fd(d):''} ${e.price?'· '+esc(e.price):''}</span></div></article>`};
+const filt=()=>{const q=S.q.toLowerCase(),c=($('#city').value||'').toLowerCase();let r=S.est.filter(e=>(!S.cat||e.category===S.cat)&&(!q||[e.name,e.city,e.neighborhood,e.category,e.description].join(' ').toLowerCase().includes(q))&&(!c||[e.city,e.neighborhood].join(' ').toLowerCase().includes(c)));const s=$('#sort').value;r.sort((a,b)=>s==='near'&&S.pos?(dist(a)??1e9)-(dist(b)??1e9):s==='rate'?avg(b)-avg(a):s==='name'?a.name.localeCompare(b.name):(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));return r};
+const empty='<p class="empty">Ainda não há estabelecimentos aqui. Ajusta a pesquisa ou cria o primeiro na área empresarial.</p>';
+function render(){const r=filt();$('#near').innerHTML=r.slice(0,4).map(card).join('')||empty;$('#rec').innerHTML=r.filter(e=>e.ratingCount).sort((a,b)=>avg(b)-avg(a)).slice(0,4).map(card).join('')||'<p class="empty">As recomendações aparecem quando existirem avaliações.</p>';$('#list').innerHTML=r.map(card).join('')||empty;$$('#cats .chip,#cats2 .chip').forEach(c=>c.classList.toggle('on',c.dataset.c===S.cat));if(map)drawPins(r)}
+const chips=`<button class="chip" data-c="">Todos</button>`+Object.entries(CATS).map(([k,v])=>`<button class="chip" data-c="${k}">${v[1]} ${v[0]}</button>`).join('');
+$('#cats').innerHTML=$('#cats2').innerHTML=chips;
+document.addEventListener('click',e=>{const c=e.target.closest('.chip');if(c){S.cat=c.dataset.c;render();if(c.closest('#cats'))show('explorar')}const k=e.target.closest('.card');if(k)openEst(k.dataset.id)});
+$('#q').oninput=e=>{S.q=e.target.value;render();if(S.q)show('explorar')};
+$('#sort').onchange=$('#city').oninput=render;
+
+async function loadEst(){try{const s=await F.getDocs(F.query(F.collection(db,'establishments'),F.orderBy('createdAt','desc'),F.limit(100)));S.est=s.docs.map(d=>({id:d.id,...d.data()}))}catch(e){toast(msg(e))}render()}
+
+/* localização */
+function locate(cb){if(!navigator.geolocation)return toast('Este dispositivo não tem GPS. Pesquisa por cidade.');navigator.geolocation.getCurrentPosition(p=>{S.pos={lat:p.coords.latitude,lng:p.coords.longitude};render();cb&&cb()},()=>toast('Sem permissão de localização. Pesquisa por cidade ou bairro.'))}
+
+/* mapa */
+let map,layer,me;
+function initMap(){if(!map){map=L.map('map').setView([38.72,-9.14],11);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);layer=L.layerGroup().addTo(map);drawPins(filt())}setTimeout(()=>map.invalidateSize(),50)}
+function drawPins(r){if(!layer)return;layer.clearLayers();r.filter(e=>e.latitude!=null).forEach(e=>L.marker([e.latitude,e.longitude],{icon:L.divIcon({className:'',html:`<div class="pin">${CATS[e.category]?.[1]||'📍'}</div>`,iconSize:[30,30]})}).addTo(layer).bindPopup(`<b>${esc(e.name)}</b><br>${stars(e)}<br><a href="#" data-open="${e.id}">Ver detalhes</a> · <a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${e.latitude},${e.longitude}">Direções</a>`))}
+document.addEventListener('click',e=>{const a=e.target.closest('[data-open]');if(a){e.preventDefault();openEst(a.dataset.open)}});
+$('#loc').onclick=()=>locate(()=>{initMap();map.setView([S.pos.lat,S.pos.lng],14);me&&me.remove();me=L.circleMarker([S.pos.lat,S.pos.lng],{radius:8}).addTo(map)});
+$('#area').onclick=()=>{const b=map.getBounds();drawPins(filt().filter(e=>e.latitude!=null&&b.contains([e.latitude,e.longitude])))};
+
+/* estabelecimento */
+async function openEst(id){const e=S.est.find(x=>x.id===id);if(!e)return;let rv=[];try{rv=(await F.getDocs(F.query(F.collection(db,'reviews'),F.where('establishmentId','==',id)))).docs.map(d=>d.data()).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0))}catch{}
+open(`<div class="ph" style="border-radius:16px;${e.photos?.[0]?`background-image:url('${esc(e.photos[0])}')`:''}">${e.photos?.[0]?'':CATS[e.category]?.[1]||'📍'}</div><h2>${esc(e.name)}</h2><p class="mu">${CATS[e.category]?.[0]||''}, ${esc(e.address||'')} ${esc(e.neighborhood||'')} ${esc(e.city||'')}</p><p>${stars(e)}</p><p style="margin:8px 0">${esc(e.description||'')}</p>${e.openingHours?`<p class="mu">Horário: ${esc(e.openingHours)}</p>`:''}${e.contact?`<p class="mu">Contacto: ${esc(e.contact)}</p>`:''}
+<div class="row" style="margin:10px 0">${e.latitude!=null?`<a class="btn" style="text-align:center;text-decoration:none" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${e.latitude},${e.longitude}">Direções</a>`:''}<button class="btn o" id="fv">${S.fav.has(id)?'Remover dos favoritos':'Guardar nos favoritos'}</button></div>
+<h2>Avaliações</h2>${rv.map(r=>`<p><span class="st">${'★'.repeat(r.rating)}</span> <b>${esc(r.authorName)}</b><br>${esc(r.text)}</p>`).join('')||'<p class="mu">Ainda ninguém avaliou. Sê o primeiro.</p>'}
+<select id="rs"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><textarea id="rt" placeholder="Escreve a tua avaliação" maxlength="500"></textarea><button class="btn" id="rb">Publicar avaliação</button>`);
+$('#fv').onclick=async()=>{if(!need())return;const r=F.doc(db,'favorites',S.user.uid+'_'+id);try{if(S.fav.has(id)){await F.deleteDoc(r);S.fav.delete(id)}else{await F.setDoc(r,{userId:S.user.uid,establishmentId:id,createdAt:F.serverTimestamp()});S.fav.add(id)}$('#fv').textContent=S.fav.has(id)?'Remover dos favoritos':'Guardar nos favoritos'}catch(x){toast(msg(x))}};
+$('#rb').onclick=async()=>{if(!need())return;const t=$('#rt').value.trim();if(!t)return toast('Escreve um comentário.');const rating=+$('#rs').value,b=F.writeBatch(db);b.set(F.doc(F.collection(db,'reviews')),{establishmentId:id,authorId:S.user.uid,authorName:S.me?.firstName||S.user.displayName||'Utilizador',rating,text:t,createdAt:F.serverTimestamp()});b.update(F.doc(db,'establishments',id),{ratingSum:F.increment(rating),ratingCount:F.increment(1)});try{await b.commit();toast('Avaliação publicada.');dlg.close();loadEst()}catch(x){toast(msg(x))}}}
+
+/* autenticação */
+const need=()=>{if(S.user)return true;authDlg();return false};
+function authDlg(){open(`<h2>Entrar no Tell Me</h2><input id="ae" type="email" placeholder="E-mail" autocomplete="email"><input id="ap" type="password" placeholder="Palavra-passe" autocomplete="current-password"><div class="row"><button class="btn" id="li">Entrar</button><button class="btn o" id="rp">Recuperar palavra-passe</button></div><h2>Criar conta</h2><select id="at"><option value="public">Utilizador</option><option value="business">Empresa (Tell Me Business)</option></select><div class="row"><input id="fn" placeholder="Nome"><input id="ln" placeholder="Apelido"></div><div id="bz" hidden><input id="bn" placeholder="Nome da empresa"><input id="nif" placeholder="NIF" inputmode="numeric"></div><button class="btn" id="su" style="width:100%">Criar conta</button>`);
+$('#at').onchange=e=>$('#bz').hidden=e.target.value!=='business';
+$('#li').onclick=()=>A.signInWithEmailAndPassword(auth,$('#ae').value,$('#ap').value).then(()=>dlg.close()).catch(e=>toast(msg(e)));
+$('#rp').onclick=()=>$('#ae').value?A.sendPasswordResetEmail(auth,$('#ae').value).then(()=>toast('Enviámos um e-mail para recuperares a palavra-passe.')).catch(e=>toast(msg(e))):toast('Escreve o teu e-mail primeiro.');
+$('#su').onclick=async()=>{const biz=$('#at').value==='business',f=$('#fn').value.trim(),l=$('#ln').value.trim();if(!f||!l)return toast('Preenche nome e apelido.');if(biz&&(!$('#bn').value.trim()||!/^\d{9}$/.test($('#nif').value.trim())))return toast('Empresa: indica o nome e um NIF com 9 dígitos.');try{const c=await A.createUserWithEmailAndPassword(auth,$('#ae').value,$('#ap').value),u=c.user;await A.updateProfile(u,{displayName:f+' '+l});await F.setDoc(F.doc(db,'users',u.uid),{uid:u.uid,firstName:f,lastName:l,email:u.email,accountType:biz?'business':'public',photoURL:'',bio:'',createdAt:F.serverTimestamp()});if(biz)await F.setDoc(F.doc(db,'businesses',u.uid),{ownerId:u.uid,businessName:$('#bn').value.trim(),nif:$('#nif').value.trim(),email:u.email,createdAt:F.serverTimestamp()});await loadMe();renderSets();dlg.close()}catch(e){toast(msg(e))}}}
+async function loadMe(){if(!S.user){S.me=null;return}try{const s=await F.getDoc(F.doc(db,'users',S.user.uid));S.me=s.exists()?s.data():null;const f=await F.getDocs(F.query(F.collection(db,'favorites'),F.where('userId','==',S.user.uid)));S.fav=new Set(f.docs.map(d=>d.data().establishmentId))}catch{}}
+A.onAuthStateChanged(auth,async u=>{S.user=u;await loadMe();$('#prof').textContent=u?(S.me?.firstName||'Perfil'):'Entrar';renderSets()});
+$('#prof').onclick=()=>S.user?show('definicoes'):authDlg();
+
+/* ficheiros */
+async function upload(file,path,max){if(file.size>max*1048576)throw new Error('O ficheiro passa o limite de '+max+' MB.');const r=T.ref(st,path),t=T.uploadBytesResumable(r,file);await new Promise((ok,no)=>t.on('state_changed',s=>toast('A enviar '+Math.round(100*s.bytesTransferred/s.totalBytes)+'%'),no,ok));return T.getDownloadURL(r)}
+
+/* comentários (feed) */
+const ini=n=>esc((n||'?')[0].toUpperCase());
+async function loadFeed(){const box=$('#feed');try{const s=await F.getDocs(F.query(F.collection(db,'posts'),F.orderBy('createdAt','desc'),F.limit(30)));if(S.user){const l=await F.getDocs(F.query(F.collection(db,'likes'),F.where('userId','==',S.user.uid)));S.likes=new Set(l.docs.map(d=>d.data().postId))}
+box.innerHTML=s.docs.map(d=>{const p=d.data(),id=d.id,e=S.est.find(x=>x.id===p.establishmentId);return`<article class="post"><div class="who"><div class="av">${ini(p.authorName)}</div><div><b>${esc(p.authorName)}</b><br><span class="mu">${p.createdAt?new Date(p.createdAt.seconds*1e3).toLocaleDateString('pt-PT'):''}${e?' em '+esc(e.name):''}</span></div></div><p style="margin-top:8px">${p.rating?`<span class="st">${'★'.repeat(p.rating)}</span> `:''}${esc(p.text)}</p>${(p.media||[]).map(u=>`<img loading="lazy" src="${esc(u)}" alt="Fotografia da publicação">`).join('')}<div class="acts"><button data-lk="${id}">${S.likes.has(id)?'❤️':'🤍'} ${p.likeCount||0}</button><button data-cm="${id}">💬 ${p.commentCount||0}</button><button data-sh="${id}">↗ Partilhar</button><button data-rp="${id}">Denunciar</button></div></article>`}).join('')||'<p class="empty">Ainda não há publicações. Partilha a primeira experiência.</p>'}catch(e){box.innerHTML='<p class="empty">Não foi possível carregar as publicações. '+esc(msg(e))+'</p>'}}
+$('#feed').onclick=async e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+if(d.lk){if(!need())return;const id=d.lk,r=F.doc(db,'likes',id+'_'+S.user.uid),bt=F.writeBatch(db),had=S.likes.has(id);had?bt.delete(r):bt.set(r,{postId:id,userId:S.user.uid,createdAt:F.serverTimestamp()});bt.update(F.doc(db,'posts',id),{likeCount:F.increment(had?-1:1)});try{await bt.commit();loadFeed()}catch(x){toast(msg(x))}}
+if(d.sh){const u=location.href.split('#')[0];navigator.share?navigator.share({title:'Tell Me',url:u}).catch(()=>{}):navigator.clipboard.writeText(u).then(()=>toast('Ligação copiada.'))}
+if(d.rp){if(!need())return;const r=prompt('Porque queres denunciar esta publicação?');if(r)F.addDoc(F.collection(db,'reports'),{reporterId:S.user.uid,contentType:'post',contentId:d.rp,reason:r.slice(0,300),status:'open',createdAt:F.serverTimestamp()}).then(()=>toast('Denúncia enviada.')).catch(x=>toast(msg(x)))}
+if(d.cm)comments(d.cm)};
+async function comments(id){let c=[];try{c=(await F.getDocs(F.query(F.collection(db,'comments'),F.where('postId','==',id)))).docs.map(x=>x.data()).sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0))}catch{}
+open(`<h2>Comentários</h2>${c.map(x=>`<p><b>${esc(x.authorName)}</b><br>${esc(x.text)}</p>`).join('')||'<p class="mu">Sem comentários ainda.</p>'}<textarea id="ct" maxlength="400" placeholder="Escreve um comentário"></textarea><button class="btn" id="cb">Comentar</button>`);
+$('#cb').onclick=async()=>{if(!need())return;const t=$('#ct').value.trim();if(!t)return;const b=F.writeBatch(db);b.set(F.doc(F.collection(db,'comments')),{postId:id,authorId:S.user.uid,authorName:S.me?.firstName||'Utilizador',text:t,createdAt:F.serverTimestamp()});b.update(F.doc(db,'posts',id),{commentCount:F.increment(1)});try{await b.commit();dlg.close();loadFeed()}catch(x){toast(msg(x))}}}
+$('#newpost').onclick=()=>{if(!need())return;open(`<h2>Criar publicação</h2><textarea id="pt" maxlength="1000" placeholder="Conta a tua experiência"></textarea><input id="pf" type="file" accept="image/*" multiple><select id="pe"><option value="">Sem estabelecimento associado</option>${S.est.map(e=>`<option value="${e.id}">${esc(e.name)}</option>`).join('')}</select><select id="pr"><option value="0">Sem classificação</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><button class="btn" id="pb" style="width:100%">Publicar</button>`);
+$('#pb').onclick=async()=>{const t=$('#pt').value.trim(),fs=[...$('#pf').files].slice(0,4);if(!t&&!fs.length)return toast('Escreve algo ou escolhe uma fotografia.');try{const media=[];for(const f of fs){if(!f.type.startsWith('image/'))throw new Error('Só são aceites imagens.');media.push(await upload(f,`posts/${S.user.uid}/${Date.now()}_${f.name.replace(/[^\w.]/g,'_')}`,5))}const r=+$('#pr').value;await F.addDoc(F.collection(db,'posts'),{authorId:S.user.uid,authorName:S.me?.firstName||'Utilizador',text:t,media,establishmentId:$('#pe').value,rating:r||0,likeCount:0,commentCount:0,visibility:'public',createdAt:F.serverTimestamp()});dlg.close();toast('Publicado.');loadFeed()}catch(x){toast(msg(x))}}};
+
+/* vídeos */
+async function loadVids(){try{const s=await F.getDocs(F.query(F.collection(db,'videos'),F.orderBy('createdAt','desc'),F.limit(20)));$('#vids').innerHTML=s.docs.map(d=>{const v=d.data();return`<article class="card vid" style="cursor:default"><video controls preload="none" playsinline src="${esc(v.url)}"></video><div class="cb"><b>${esc(v.title)}</b><span>${esc(v.authorName)}</span></div></article>`}).join('')||'<p class="empty">Ainda não há vídeos. Publica o primeiro.</p>'}catch(e){$('#vids').innerHTML='<p class="empty">Não foi possível carregar os vídeos. '+esc(msg(e))+'</p>'}}
+$('#newvid').onclick=()=>{if(!need())return;open(`<h2>Publicar vídeo</h2><input id="vt" placeholder="Título" maxlength="100"><input id="vf" type="file" accept="video/mp4,video/webm"><p class="mu">MP4 ou WebM, até 50 MB.</p><button class="btn" id="vb" style="width:100%">Publicar vídeo</button>`);
+$('#vb').onclick=async()=>{const f=$('#vf').files[0],t=$('#vt').value.trim();if(!f||!t)return toast('Indica o título e escolhe um vídeo.');try{const url=await upload(f,`videos/${S.user.uid}/${Date.now()}_${f.name.replace(/[^\w.]/g,'_')}`,50);await F.addDoc(F.collection(db,'videos'),{authorId:S.user.uid,authorName:S.me?.firstName||'Utilizador',title:t,url,createdAt:F.serverTimestamp()});dlg.close();toast('Vídeo publicado.');loadVids()}catch(x){toast(msg(x))}}};
+
+/* definições e área empresarial */
+function renderSets(){const b=$('#sets'),th=getTh();applyTheme();
+const themeSel=`<h2>Aparência</h2><select id="th"><option value="auto">Tema do sistema</option><option value="light">Claro</option><option value="dark">Escuro</option></select><h2>Ajuda</h2><p class="mu">Para apoio, contacta a equipa Tell Me. Os termos de utilização e a política de privacidade têm de ser publicados antes do lançamento.</p>`;
+if(!S.user){b.innerHTML=`<p class="empty">Entra para gerires o teu perfil.</p><button class="btn" id="lg">Entrar ou criar conta</button>${themeSel}`;$('#lg').onclick=authDlg}
+else{b.innerHTML=`<div class="who"><div class="av">${ini(S.me?.firstName)}</div><div><b>${esc(S.me?.firstName||'')} ${esc(S.me?.lastName||'')}</b><br><span class="mu">${esc(S.user.email)}, conta ${S.me?.accountType==='business'?'empresarial':'de utilizador'}</span></div></div><h2>Perfil</h2><input id="pn" value="${esc(S.me?.firstName||'')}" placeholder="Nome"><textarea id="pbio" placeholder="Biografia" maxlength="200">${esc(S.me?.bio||'')}</textarea><button class="btn" id="ps">Guardar perfil</button>${S.me?.accountType==='business'?`<h2>Tell Me Business</h2><button class="btn" id="ne">Criar estabelecimento</button><div class="grid" id="mine" style="margin-top:12px"></div>`:''}${themeSel}<h2>Conta</h2><div class="row"><button class="btn o" id="pw">Alterar palavra-passe</button><button class="btn o" id="lo">Terminar sessão</button></div>`;
+$('#ps').onclick=()=>F.updateDoc(F.doc(db,'users',S.user.uid),{firstName:$('#pn').value.trim(),bio:$('#pbio').value.trim()}).then(()=>{loadMe();toast('Perfil guardado.')}).catch(e=>toast(msg(e)));
+$('#pw').onclick=()=>A.sendPasswordResetEmail(auth,S.user.email).then(()=>toast('Enviámos um e-mail para alterares a palavra-passe.'));
+$('#lo').onclick=()=>A.signOut(auth);
+if($('#ne')){$('#ne').onclick=newEst;$('#mine').innerHTML=S.est.filter(e=>e.ownerId===S.user.uid).map(card).join('')||'<p class="empty">Ainda não tens estabelecimentos.</p>'}}
+$('#th').value=th;$('#th').onchange=e=>{try{localStorage.setItem('tm-theme',e.target.value)}catch{}applyTheme()}}
+function newEst(){open(`<h2>Novo estabelecimento</h2><input id="en" placeholder="Nome" maxlength="80"><select id="ec">${Object.entries(CATS).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('')}</select><textarea id="ed" placeholder="Descrição" maxlength="600"></textarea><div class="row"><input id="ecy" placeholder="Cidade"><input id="enb" placeholder="Bairro"></div><input id="ead" placeholder="Morada"><div class="row"><input id="elat" placeholder="Latitude" inputmode="decimal"><input id="elng" placeholder="Longitude" inputmode="decimal"></div><button class="btn o" id="eg" style="width:100%;margin-bottom:8px">Usar a minha localização</button><div class="row"><input id="ep" placeholder="Preço (ex.: 10 a 25 €)"><input id="eh" placeholder="Horário"></div><input id="etc" placeholder="Contacto"><input id="ef" type="file" accept="image/*"><button class="btn" id="es" style="width:100%">Guardar estabelecimento</button>`);
+$('#eg').onclick=()=>navigator.geolocation?.getCurrentPosition(p=>{$('#elat').value=p.coords.latitude.toFixed(6);$('#elng').value=p.coords.longitude.toFixed(6)},()=>toast('Sem permissão de localização.'));
+$('#es').onclick=async()=>{const n=$('#en').value.trim();if(!n)return toast('Indica o nome.');const la=parseFloat($('#elat').value),lo=parseFloat($('#elng').value);try{const photos=[],f=$('#ef').files[0];if(f)photos.push(await upload(f,`establishments/${S.user.uid}/${Date.now()}_${f.name.replace(/[^\w.]/g,'_')}`,5));await F.addDoc(F.collection(db,'establishments'),{ownerId:S.user.uid,businessId:S.user.uid,name:n,category:$('#ec').value,description:$('#ed').value.trim(),city:$('#ecy').value.trim(),neighborhood:$('#enb').value.trim(),address:$('#ead').value.trim(),latitude:isNaN(la)?null:la,longitude:isNaN(lo)?null:lo,photos,price:$('#ep').value.trim(),openingHours:$('#eh').value.trim(),contact:$('#etc').value.trim(),ratingSum:0,ratingCount:0,createdAt:F.serverTimestamp(),updatedAt:F.serverTimestamp()});dlg.close();toast('Estabelecimento guardado.');await loadEst();renderSets()}catch(x){toast(msg(x))}}}
+
+loadEst();renderSets();
+if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
